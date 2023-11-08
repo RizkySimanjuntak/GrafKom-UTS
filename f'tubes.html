@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Menampilkan Data CSV dan Grafik di Canvas</title>
+    <style>
+        canvas {
+            border: 2px solid black;
+        }
+    </style>
+    <script src="script.js"></script>
+</head>
+<body>
+    <input type="file" id="csvFile" accept=".csv">
+    <canvas id="canvas1" width="900" height="400"></canvas>
+
+    <script>
+        var canvasSaya;
+        canvasSaya = document.querySelector("#canvas1");
+        var ctx;
+        ctx = canvasSaya.getContext("2d");
+        
+        var totalBars = 30;
+        var lebarBar = 20;
+        var jarakAntarBar = 5;
+
+        
+        function gambarloading(index, data) {
+            var tinggiData = data[index].calories;
+            var tinggibar = tinggiData * (canvasSaya.height - 200) / 100; // Menghasilkan tinggi secara acak
+            var y = canvasSaya.height + 10; // Posisi vertikal loading bar (mulai dari bawah)
+            var x = index * (lebarBar + jarakAntarBar);
+            
+            var pointArray = [
+                { x: x, y: y },
+                { x: x, y: y - tinggibar },
+                { x: x + lebarBar, y: y - tinggibar },
+                { x: x + lebarBar, y: y },
+            ];
+            
+            polygon(ctx, pointArray, 64,224,208);
+            
+                function polygon(ctx, points, red, green, blue) {
+                    ctx.fillStyle = `rgb(${red}, ${green}, ${blue})`;
+                    ctx.beginPath();
+                    ctx.moveTo(points[0].x, points[0].y);
+                    for (var i = 1; i < points.length; i++) {
+                        ctx.lineTo(points[i].x, points[i].y);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                }
+                
+            // Menambahkan teks di atas setiap bar
+            ctx.fillStyle = "black";
+            ctx.font = "12px Arial";
+            ctx.fillText(tinggiData, x, y - tinggibar - 5);
+        };
+
+        function animasiLoading(data) {
+            var delay = 100; // Delay antar animasi (dalam milidetik)
+            var currentIndex = 0;
+
+            function animateNextBar() {
+                if (currentIndex < totalBars) {
+                    gambarloading(currentIndex, data);
+                    currentIndex++;
+                    setTimeout(animateNextBar, delay);
+                }
+            }
+            animateNextBar();
+        };
+
+        document.getElementById("csvFile").addEventListener("change", function(event) {
+            var file = event.target.files[0];
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+                var contents = e.target.result;
+                var lines = contents.split("\n");
+                var data = [];
+
+                for (var i = 0; i < lines.length; i++) {
+                    var row = lines[i].split(",");
+                    if (row.length >= 2) {
+                        data.push({ name: row[0], calories: parseInt(row[3]) });
+                    }
+                }
+                animasiLoading(data);
+            };
+            reader.readAsText(file);
+        });
+    </script>
+</body>
+</html>
