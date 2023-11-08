@@ -13,6 +13,7 @@
             padding: 5px;
             border: 1px solid white;
             display: none;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -60,7 +61,7 @@
             ctx.font = "12px Arial";
             ctx.fillText(tinggiData, x, y - 5);
 
-            // Mendaftarkan peristiwa klik pada setiap bar
+            // Membuat event klik pada setiap bar
             canvasSaya.addEventListener("click", function(event) {
                 var mouseX = event.clientX - canvasSaya.getBoundingClientRect().left;
                 var mouseY = event.clientY - canvasSaya.getBoundingClientRect().top;
